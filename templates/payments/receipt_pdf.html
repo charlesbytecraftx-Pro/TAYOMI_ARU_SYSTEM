@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    {% load humanize %}
+    <style>
+        @page {
+            size: a5 portrait;
+            margin: 0.5cm;
+        }
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            color: #333;
+            line-height: 1.2;
+            position: relative;
+        }
+
+        /* WATERMARK */
+        #watermark {
+            position: fixed;
+            top: 40%;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            opacity: 0.08; 
+            transform: rotate(-35deg);
+            font-size: 38px;
+            color: #8e44ad;
+            font-weight: bold;
+            z-index: -1000;
+        }
+
+        /* HEADER */
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: -5px;
+        }
+        .logo-img {
+            width: 55px;
+            height: auto;
+        }
+
+        .header-info {
+            text-align: center;
+            border-bottom: 2.5px solid #8e44ad;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .org-main {
+            color: #4a235a;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+
+        .contribution-subtitle {
+            font-size: 11px;
+            color: #8e44ad;
+            font-weight: bold;
+            margin: 3px 0;
+            text-transform: uppercase;
+        }
+
+        .receipt-title {
+            font-size: 11px;
+            background-color: #8e44ad;
+            color: white;
+            display: inline-block;
+            padding: 3px 15px;
+            border-radius: 5px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        /* DETAILS TABLE */
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .details-table td {
+            padding: 7px 5px;
+            border-bottom: 1px solid #f2f2f2;
+            font-size: 11px;
+        }
+        .label { font-weight: bold; color: #555; width: 40%; text-transform: uppercase; font-size: 10px; }
+        .value { color: #000; text-align: right; font-weight: 500; }
+
+        /* AMOUNT BOX */
+        .amount-box {
+            background-color: #f8f4f9;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1.5px dashed #8e44ad;
+        }
+        .amount-value {
+            font-size: 22px;
+            font-weight: bold;
+            color: #8e44ad;
+        }
+
+        /* VERIFICATION SECTION */
+        .verification-container {
+            width: 100%;
+            margin-top: 20px;
+            min-height: 80px;
+        }
+        .office-section {
+            width: 55%;
+            float: left;
+            border-left: 4px solid #27ae60;
+            background-color: #f2f9f5;
+            padding: 8px;
+            border-radius: 0 5px 5px 0;
+        }
+        .signature-section {
+            width: 40%;
+            float: right;
+            text-align: center;
+        }
+        .signature-stamp {
+            border: 2px solid #27ae60;
+            color: #27ae60;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 6px;
+            display: inline-block;
+            font-size: 11px;
+            transform: rotate(-8deg);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            background-color: rgba(39, 174, 96, 0.05);
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 9px;
+            color: #777;
+            border-top: 1px solid #eee;
+            padding-top: 8px;
+        }
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+        .timestamp {
+            font-size: 7px;
+            color: #bbb;
+            text-align: left;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="watermark">
+        {{ payment.contribution_type.name|upper }}<br>
+        TAYOMI ARU
+    </div>
+
+    <table class="header-table">
+        <tr>
+            <td style="text-align: left; vertical-align: top; width: 20%;">
+                {% if request %}
+                    <img src="{{ request.scheme }}://{{ request.get_host }}/static/images/Casfeta_aru_logo.png" class="logo-img">
+                {% endif %}
+            </td>
+            <td style="text-align: center; width: 60%;">
+                <div class="header-info">
+                    <p class="org-main">CASFETA TAYOMI ARU</p>
+                    <p class="contribution-subtitle">{{ payment.contribution_type.name }}</p>
+                    <p style="margin: 0; font-size: 9px; color: #555;">Ardhi University, Dar es Salaam</p>
+                    <div class="receipt-title">RISITI RASMI YA MALIPO</div>
+                </div>
+            </td>
+            <td style="text-align: right; vertical-align: top; width: 20%;">
+                {% if request %}
+                    <img src="{{ request.scheme }}://{{ request.get_host }}/static/images/Casfeta_Tayomi_logo.png" class="logo-img">
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <table style="width: 100%; margin-top: 2px;">
+        <tr>
+            <td style="font-size: 10px; color: #555; font-weight: bold;">Receipt No: #{{ payment.id|stringformat:"04d" }}</td>
+            <td style="text-align: right; font-size: 10px; color: #555;">Siku: {{ payment.date_paid|date:"d M, Y" }}</td>
+        </tr>
+    </table>
+
+    <table class="details-table">
+        <tr>
+            <td class="label">Mlipaji (Member):</td>
+            <td class="value">{{ payment.member.get_full_name|default:payment.member.username|title }}</td>
+        </tr>
+        <tr>
+            <td class="label">Namba ya Muamala:</td>
+            <td class="value"><code style="font-family: monospace; font-size: 12px;">{{ payment.reference_number|default:"---" }}</code></td>
+        </tr>
+        <tr>
+            <td class="label">Lengo la Malipo:</td>
+            <td class="value">{{ payment.contribution_type.category|default:"Mchango wa Kawaida" }}</td>
+        </tr>
+        <tr>
+            <td class="label">Hali (Status):</td>
+            <td class="value" style="color: {% if payment.status == 'Confirmed' %}#27ae60{% else %}#e67e22{% endif %}; font-weight: bold;">
+                {{ payment.status|upper }}
+            </td>
+        </tr>
+    </table>
+
+    <div class="amount-box">
+        <p style="margin: 0; font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px;">Kiasi Kilichothibitishwa (Amount Paid)</p>
+        <div class="amount-value">TZS {{ payment.amount|intcomma }} /=</div>
+    </div>
+
+    <div class="verification-container clearfix">
+        <div class="office-section">
+            <p style="font-size: 10px; margin: 2px 0; color: #27ae60;"><strong>Ofisi ya Hazina:</strong></p>
+            <p style="font-size: 10px; margin: 2px 0; font-style: italic; color: #555;">
+                "{{ payment.admin_comment|default:"Malipo yamepokelewa na kuhakikiwa na mfumo wa TAYOMI-ARU." }}"
+            </p>
+        </div>
+        
+        <div class="signature-section">
+            {% if payment.status == 'Confirmed' %}
+                <div class="signature-stamp">VERIFIED & SECURED</div>
+                <p style="font-size: 8px; margin: 0; border-top: 1.5px solid #444; padding-top: 3px; font-weight: bold;">
+                    {{ payment.verified_by.get_full_name|default:"TAYOMI TREASURER" }}<br>
+                    <span style="color: #777;">System ID: #{{ payment.verified_by.id|default:"AUTOGEN" }}</span>
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="timestamp">
+        Generated on: {% now "Y-m-d H:i:s" %} | Record Integrity Verified
+    </div>
+
+    <div class="footer">
+        <p style="margin-bottom: 3px; font-weight: bold; color: #4a235a;">"Uaminifu wako ni baraka kwa wengine."</p>
+        <p style="margin: 0;">
+            Email: info@tayomiaru.or.tz | Website: www.tayomiaru.or.tz<br>
+            Ardhi University, S.L.P 35176, Dar es Salaam, Tanzania
+        </p>
+    </div>
+
+</body>
+</html>

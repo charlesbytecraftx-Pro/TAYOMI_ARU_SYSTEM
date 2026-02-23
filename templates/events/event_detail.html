@@ -1,0 +1,126 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{{ event.title }} | TAYOMI ARU{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-md-5">
+    <div class="mb-4">
+        <a href="{% url 'event_list' %}" class="btn btn-light rounded-pill px-3 py-2 text-purple shadow-sm small border-0">
+            <i class="fas fa-arrow-left me-2"></i>Rudi kwenye Orodha
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                {% if event.image %}
+                <div class="event-banner-container">
+                    <img src="{{ event.image.url }}" class="img-fluid w-100" alt="{{ event.title }}" style="max-height: 400px; object-fit: cover;">
+                </div>
+                {% endif %}
+
+                <div class="p-4 p-md-5 bg-purple text-white position-relative">
+                    <div class="position-relative z-index-1">
+                        <span class="badge bg-white text-purple mb-3 px-3 py-2 rounded-pill fw-bold shadow-sm">
+                            <i class="fas fa-users me-1"></i> {{ event.group.name|default:"Wanachama Wote" }}
+                        </span>
+                        <h1 class="fw-bold display-5 mb-0">{{ event.title }}</h1>
+                    </div>
+                    <i class="fas fa-calendar-alt position-absolute end-0 bottom-0 m-4 fa-5x opacity-25"></i>
+                </div>
+                
+                <div class="card-body p-4 p-md-5">
+                    <h5 class="fw-bold text-dark mb-3">Maelezo ya Tukio</h5>
+                    <div class="text-muted leading-relaxed" style="white-space: pre-line; font-size: 1.1rem;">
+                        {{ event.description }}
+                    </div>
+                    
+                    <hr class="my-5 opacity-25">
+                    
+                    <div class="d-flex align-items-center p-4 rounded-4 bg-light border-start border-4 border-purple">
+                        <div class="flex-shrink-0">
+                            <div class="bg-white p-3 rounded-circle shadow-sm">
+                                <i class="fas fa-user-edit fa-2x text-purple opacity-75"></i>
+                            </div>
+                        </div>
+                        <div class="ms-4">
+                            <p class="mb-0 text-muted small">Mratibu wa Tukio</p>
+                            <p class="mb-0 fw-bold fs-5 text-dark">{{ event.created_by.get_full_name|default:event.created_by.username }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top: 20px;">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-dark mb-4">Lini na Wapi?</h5>
+                    
+                    <div class="d-flex flex-column gap-4 mb-4">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-circle-lg bg-purple-light text-purple me-3 shadow-sm">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div>
+                                <p class="mb-0 text-muted small">Tarehe</p>
+                                <p class="mb-0 fw-bold">{{ event.date|date:"l, d F Y" }}</p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center">
+                            <div class="icon-circle-lg bg-purple-light text-purple me-3 shadow-sm">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <p class="mb-0 text-muted small">Muda</p>
+                                <p class="mb-0 fw-bold">{{ event.time|time:"H:i" }} EAT</p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center">
+                            <div class="icon-circle-lg bg-danger-light text-danger me-3 shadow-sm">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div>
+                                <p class="mb-0 text-muted small">Mahali</p>
+                                <p class="mb-0 fw-bold">{{ event.location }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button onclick="window.print()" class="btn btn-outline-purple rounded-pill py-2">
+                            <i class="fas fa-print me-2"></i>Pakua kama PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .text-purple { color: #8e44ad !important; }
+    .bg-purple { background-color: #8e44ad !important; }
+    .bg-purple-light { background-color: rgba(142, 68, 173, 0.1); }
+    .bg-danger-light { background-color: rgba(231, 76, 60, 0.1); }
+    .btn-outline-purple { border-color: #8e44ad; color: #8e44ad; transition: 0.3s; }
+    .btn-outline-purple:hover { background-color: #8e44ad; color: white; }
+    
+    .icon-circle-lg { 
+        width: 50px; height: 50px; 
+        border-radius: 50%; 
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.2rem;
+    }
+    .rounded-4 { border-radius: 1.2rem !important; }
+    .leading-relaxed { line-height: 1.8; }
+    
+    @media print {
+        .btn, .breadcrumb, nav { display: none !important; }
+        .card { border: 1px solid #ddd !important; box-shadow: none !important; }
+    }
+</style>
+{% endblock %}

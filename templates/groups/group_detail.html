@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ group.name }} | Wanachama</title>
+</head>
+<body>
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="row g-0">
+                    <div class="col-md-4 bg-purple d-flex align-items-center justify-content-center p-5 text-white">
+                        <div class="text-center">
+                            <i class="fas fa-users fa-5x mb-3 opacity-50"></i>
+                            <h2 class="fw-bold mb-0">{{ group.name }}</h2>
+                            <span class="badge bg-white text-purple rounded-pill px-3">{{ member_count }} Wanachama</span>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body p-4 p-md-5">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h4 class="fw-bold text-dark">Maono na Maelezo</h4>
+                                <a href="{% url 'group_list' %}" class="btn btn-outline-purple btn-sm rounded-pill">
+                                    <i class="fas fa-arrow-left me-1"></i> Mikakati Yote
+                                </a>
+                            </div>
+                            <p class="text-muted fs-5 leading-relaxed">
+                                {{ group.description|default:"Kundi hili bado halijaweka maelezo ya kina ya huduma zake." }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="fw-bold text-dark mb-4">Wanachama wa {{ group.name }}</h3>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {% for member in members %}
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 text-center h-100 member-card">
+                <div class="card-body p-4">
+                    <div class="mb-3 position-relative d-inline-block">
+                        {% if member.profile_image %}
+                            <img src="{{ member.profile_image.url }}" class="rounded-circle shadow-sm border border-3 border-white" style="width: 100px; height: 100px; object-fit: cover;">
+                        {% else %}
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto border" style="width: 100px; height: 100px;">
+                                <i class="fas fa-user fa-3x text-muted opacity-50"></i>
+                            </div>
+                        {% endif %}
+                        {% if member.is_staff %}
+                        <span class="position-absolute bottom-0 end-0 badge rounded-circle bg-warning p-2 border border-2 border-white" title="Kiongozi">
+                            <i class="fas fa-crown text-white shadow-sm"></i>
+                        </span>
+                        {% endif %}
+                    </div>
+                    <h6 class="fw-bold mb-1 text-dark text-truncate">{{ member.get_full_name|default:member.username }}</h6>
+                    <p class="text-muted small mb-0">{{ member.email|truncatechars:20 }}</p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <p class="text-muted">Bado hakuna mwanachama aliyesajiliwa kwenye mkakati huu.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .bg-purple { background-color: #8e44ad !important; }
+    .text-purple { color: #8e44ad !important; }
+    .btn-outline-purple { border-color: #8e44ad; color: #8e44ad; }
+    .btn-outline-purple:hover { background-color: #8e44ad; color: white; }
+    .rounded-4 { border-radius: 1rem !important; }
+    .leading-relaxed { line-height: 1.6; }
+    .member-card { transition: transform 0.3s; }
+    .member-card:hover { transform: translateY(-5px); }
+</style>
+{% endblock %}
+</body>
+</html>

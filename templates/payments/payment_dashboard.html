@@ -1,0 +1,301 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard ya Malipo | TAYOMI ARU{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 px-md-5" style="max-width: 1500px;">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <a href="{% url 'user_dashboard' %}" class="btn btn-light btn-lg rounded-pill shadow-sm px-4 fw-bold">
+                <i class="fas fa-arrow-left me-2 text-purple"></i> Menu Kuu
+            </a>
+            <div class="profile-nav d-flex align-items-center">
+                <span class="me-3 fs-5 fw-bold d-none d-md-block">{{ request.user.username }}</span>
+                {% if request.user.profile.profile_pic %}
+                    <img src="{{ request.user.profile.profile_pic.url }}" class="rounded-circle border border-2 border-purple" width="50" height="50" alt="Profile">
+                {% else %}
+                    <div class="rounded-circle bg-purple text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width:50px; height:50px; font-size: 20px;">
+                        {{ request.user.username|slice:":1"|upper }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} border-0 shadow-sm rounded-4 p-3 mb-3 animate__animated animate__fadeIn fs-6">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% for p in recent_payments %}
+                {% if p.status == 'Rejected' %}
+                <div class="alert alert-warning border-0 shadow-sm rounded-4 p-4 d-flex align-items-center mb-3 animate__animated animate__headShake">
+                    <i class="fas fa-exclamation-circle fa-3x me-3 text-danger"></i>
+                    <div class="flex-grow-1">
+                        <h5 class="fw-bold mb-1 text-danger">Malipo Yamekataliwa!</h5>
+                        <p class="mb-0 fs-6 text-dark">Reference <strong>{{ p.reference_number }}</strong> ina makosa au haijatambulika.</p>
+                    </div>
+                    <a href="{% url 'payment_list' %}" class="btn btn-danger btn-lg rounded-pill px-4 shadow-sm fw-bold">Sahihisha</a>
+                </div>
+                {% endif %}
+            {% endfor %}
+
+            {% if remaining_balance > 0 %}
+            <div class="alert border-0 shadow-sm rounded-4 p-4 d-flex align-items-center mb-4 text-white animate__animated animate__pulse animate__infinite" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                <i class="fas fa-receipt fa-3x me-3"></i>
+                <div class="flex-grow-1">
+                    <h4 class="fw-bold mb-1 text-white">Salio la Deni</h4>
+                    <p class="mb-0 fs-5 opacity-85">Bado unadaiwa TZS {{ remaining_balance }} ili kukamilisha michango yako.</p>
+                </div>
+                <a href="{% url 'payment_list' %}" class="btn btn-light btn-lg rounded-pill px-5 fw-bold text-danger shadow">Lipa Sasa</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mb-4 align-items-center g-3">
+        <div class="col-md-6">
+            <h1 class="fw-bold text-dark mb-1 display-6">Hali ya Malipo</h1>
+            <p class="text-muted fs-5 mb-0">Muhtasari wa michango yako yote.</p>
+        </div>
+        <div class="col-md-6">
+            <div class="input-group shadow-sm rounded-pill overflow-hidden border-0 bg-white">
+                <span class="input-group-text bg-white border-0 ps-4">
+                    <i class="fas fa-search text-muted fa-lg"></i>
+                </span>
+                <input type="text" id="paymentSearch" class="form-control border-0 py-3 fs-6 shadow-none" placeholder="Tafuta mchango, kiasi au hali ya malipo...">
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 g-md-4 mb-5">
+        <div class="col-6 col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 text-white h-100 position-relative overflow-hidden" style="background: linear-gradient(135deg, #6a11cb, #2575fc); min-height: 160px;">
+                <div class="position-absolute opacity-25" style="right: -10px; bottom: -10px;"><i class="fas fa-dollar-sign fa-6x"></i></div>
+                <p class="mb-2 opacity-85 fs-6 text-uppercase fw-bold">Inayotakiwa</p>
+                <h2 class="fw-bold mb-0 display-6">{{ total_to_pay }} <small class="fs-6 fw-normal text-white">TZS</small></h2>
+            </div>
+        </div>
+        <div class="col-6 col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 text-white h-100 position-relative overflow-hidden" style="background: linear-gradient(135deg, #11998e, #38ef7d); min-height: 160px;">
+                <div class="position-absolute opacity-25" style="right: -10px; bottom: -10px;"><i class="fas fa-check-circle fa-6x"></i></div>
+                <p class="mb-2 opacity-85 fs-6 text-uppercase fw-bold">Zilizolipwa</p>
+                <h2 class="fw-bold mb-0 display-6">{{ total_paid }} <small class="fs-6 fw-normal text-white">TZS</small></h2>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 text-white h-100 position-relative overflow-hidden" style="background: linear-gradient(135deg, #f12711, #f5af19); min-height: 160px;">
+                <div class="position-absolute opacity-25" style="right: -10px; bottom: -10px;"><i class="fas fa-clock fa-6x"></i></div>
+                <p class="mb-2 opacity-85 fs-6 text-uppercase fw-bold">Baki (Deni)</p>
+                <h2 class="fw-bold mb-0 display-6">{{ remaining_balance }} <small class="fs-6 fw-normal text-white">TZS</small></h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                <div class="card-header bg-white py-4 border-0 d-flex justify-content-between align-items-center border-bottom">
+                    <h5 class="fw-bold mb-0"><i class="fas fa-history me-2 text-purple"></i>Miamala ya Hivi Karibuni</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle" id="paymentTable">
+                        <thead class="bg-light">
+                            <tr class="v-small text-muted">
+                                <th class="ps-4 py-3">MCHANGO</th>
+                                <th class="py-3">KIASI</th>
+                                <th class="py-3">HALI</th>
+                                <th class="text-end pe-4 py-3">RISITI / TAREHE</th>
+                            </tr>
+                        </thead>
+                        <tbody class="fs-6">
+                            {% for p in recent_payments %}
+                            <tr style="height: 70px;">
+                                <td class="ps-4">
+                                    <span class="fw-bold text-dark d-block fs-6">{{ p.contribution_type.name }}</span>
+                                    <small class="text-muted" style="font-size: 12px;">Ref: {{ p.reference_number }}</small>
+                                </td>
+                                <td class="fw-bold text-dark">{{ p.amount }}</td>
+                                <td>
+                                    <span class="badge {% if p.status == 'Confirmed' %}bg-success-subtle text-success{% elif p.status == 'Pending' %}bg-warning-subtle text-warning{% elif p.status == 'Rejected' %}bg-danger-subtle text-danger{% else %}bg-secondary-subtle text-muted{% endif %} rounded-pill px-3 py-2 fs-6">
+                                        <i class="fas fa-circle me-1" style="font-size: 8px;"></i> {{ p.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    {% if p.status == 'Confirmed' %}
+                                        <a href="{% url 'download_receipt' p.id %}" class="btn btn-sm btn-outline-purple rounded-pill px-3 shadow-sm fw-bold">
+                                            <i class="fas fa-download me-1"></i> PDF
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted fw-medium">{{ p.date_paid|date:"d M, Y" }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center py-5 text-muted fs-5">Bado huna muamala wowote. <a href="{% url 'payment_list' %}" class="text-purple">Lipia hapa</a></td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            {% if user.is_staff %}
+            <div class="card border-0 shadow-lg rounded-4 p-4 bg-dark text-white mb-4">
+                <h5 class="fw-bold mb-4 d-flex align-items-center"><i class="fas fa-user-shield text-warning me-3 fa-lg"></i> Admin Hub</h5>
+                <div class="p-4 rounded-4 bg-white bg-opacity-10 mb-4 border border-secondary">
+                    <small class="opacity-75 d-block mb-2 fs-6">Miamala Inayosubiri:</small>
+                    <h1 class="fw-bold text-warning mb-0 display-4">{{ admin_pending }}</h1>
+                </div>
+                <div class="d-grid gap-3">
+                    <a href="{% url 'admin_payment_list' %}" class="btn btn-warning btn-lg rounded-pill fw-bold shadow">Hakiki Miamala</a>
+                    <button type="button" class="btn btn-outline-light btn-lg rounded-pill fw-bold" data-bs-toggle="modal" data-bs-target="#manageContributionModal">
+                        <i class="fas fa-cog me-2"></i> Simamia Michango
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h5 class="fw-bold mb-4 text-purple"><i class="fas fa-bolt me-2"></i>Njia za Haraka</h5>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'payment_list' %}" class="list-group-item list-group-item-action border-0 px-0 fs-6 d-flex align-items-center py-3">
+                        <div class="icon-box-sm bg-purple-subtle text-purple rounded-circle me-3"><i class="fas fa-plus"></i></div>
+                        Lipia Mchango Mpya
+                    </a>
+                    <a href="https://wa.me/255748832699" target="_blank" class="list-group-item list-group-item-action border-0 px-0 fs-6 d-flex align-items-center py-3">
+                        <div class="icon-box-sm bg-success-subtle text-success rounded-circle me-3"><i class="fab fa-whatsapp"></i></div>
+                        Chat na Mhazina
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action border-0 px-0 fs-6 d-flex align-items-center py-3">
+                        <div class="icon-box-sm bg-info-subtle text-info rounded-circle me-3"><i class="fas fa-file-invoice"></i></div>
+                        Ripoti ya Mwaka
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="manageContributionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <div class="modal-header border-0 p-4 pb-0">
+                <h4 class="fw-bold text-dark mb-0">Usimamizi wa Michango</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form action="{% url 'add_contribution_type' %}" method="POST" class="mb-4 bg-light p-4 rounded-4 border">
+                    {% csrf_token %}
+                    <label class="form-label fs-6 fw-bold text-purple mb-3">Ongeza Mchango Mpya na Kiasi</label>
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <input type="text" name="name" class="form-control form-control-lg border-0 px-3 shadow-none mb-1 fs-6" placeholder="Jina la Mchango" required>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="number" name="base_amount" class="form-control form-control-lg border-0 px-3 shadow-none mb-1 fs-6" placeholder="Kiasi (TZS)" required>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-purple btn-lg text-white w-100 fw-bold rounded-pill">Hifadhi</button>
+                        </div>
+                        <div class="col-12">
+                            <input type="text" name="description" class="form-control form-control-lg border-0 px-3 shadow-none fs-6" placeholder="Maelezo mafupi ya mchango huu (Sio lazima)">
+                        </div>
+                    </div>
+                </form>
+
+                <div class="table-responsive" style="max-height: 450px;">
+                    <table class="table align-middle">
+                        <thead class="text-muted v-small text-uppercase bg-light">
+                            <tr>
+                                <th class="ps-2 py-3">Mchango & Maelezo</th>
+                                <th class="py-3 text-center">Kiasi (TZS)</th>
+                                <th class="text-end pe-2 py-3">Vitendo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ct in contribution_types %}
+                            <tr>
+                                <td class="ps-2 py-3">
+                                    <form action="{% url 'edit_contribution_type' ct.pk %}" method="POST" class="edit-form">
+                                        {% csrf_token %}
+                                        <input type="text" name="name" value="{{ ct.name }}" class="form-control border-0 bg-transparent fw-bold p-0 shadow-none edit-input mb-0 fs-6" required>
+                                        <input type="text" name="description" value="{{ ct.description|default:'' }}" class="form-control border-0 bg-transparent p-0 shadow-none edit-input fs-6 text-muted" placeholder="Ongeza maelezo...">
+                                </td>
+                                <td class="text-center">
+                                        <input type="number" name="base_amount" value="{{ ct.base_amount }}" class="form-control border-0 bg-transparent p-0 shadow-none edit-input fw-bold text-purple text-center fs-6" required>
+                                </td>
+                                <td class="text-end pe-2">
+                                        <button type="submit" class="btn btn-link text-success btn-lg p-0 ms-2 d-none save-btn"><i class="fas fa-check-circle"></i></button>
+                                    </form>
+                                    <a href="{% url 'delete_contribution_type' ct.pk %}" class="btn btn-link text-danger btn-lg p-0 ms-3" onclick="return confirm('Futa mchango huu kabisa?')">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="3" class="text-center py-4 fs-6 text-muted">Hakuna michango iliyoandaliwa bado.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root { --purple: #8e44ad; --purple-light: #9b59b6; }
+    .bg-purple { background-color: var(--purple); }
+    .text-purple { color: var(--purple) !important; }
+    .btn-purple { background-color: var(--purple); color: white; border: none; }
+    .btn-purple:hover { background-color: var(--purple-light); color: white; transform: translateY(-2px); }
+    .btn-outline-purple { border: 2px solid var(--purple); color: var(--purple); }
+    .btn-outline-purple:hover { background: var(--purple); color: white; }
+    
+    .bg-success-subtle { background-color: #d1e7dd; color: #0f5132 !important; }
+    .bg-warning-subtle { background-color: #fff3cd; color: #664d03 !important; }
+    .bg-danger-subtle { background-color: #f8d7da; color: #842029 !important; }
+    .bg-purple-subtle { background-color: #f3e5f5; }
+    .bg-info-subtle { background-color: #e0f7fa; }
+
+    .rounded-4 { border-radius: 1.5rem !important; }
+    .v-small { font-size: 12px !important; font-weight: 700; }
+    .icon-box-sm { width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    
+    .table thead th { font-weight: 700; letter-spacing: 0.8px; border-top: none; }
+    .edit-input:focus { border-bottom: 2px solid var(--purple) !important; background: #fdfaff !important; border-radius: 0; }
+    
+    .animate__animated { animation-duration: 0.8s; }
+</style>
+
+<script>
+    // 1. Live Search
+    document.getElementById('paymentSearch').addEventListener('keyup', function() {
+        let value = this.value.toLowerCase();
+        let rows = document.querySelectorAll('#paymentTable tbody tr');
+        rows.forEach(row => {
+            let text = row.innerText.toLowerCase();
+            row.style.display = text.includes(value) ? '' : 'none';
+        });
+    });
+
+    // 2. Inline Edit Logic
+    document.querySelectorAll('.edit-input').forEach(input => {
+        input.addEventListener('input', function() {
+            const row = this.closest('tr');
+            const saveBtn = row.querySelector('.save-btn');
+            if (saveBtn) {
+                saveBtn.classList.remove('d-none');
+            }
+        });
+    });
+</script>
+{% endblock %}

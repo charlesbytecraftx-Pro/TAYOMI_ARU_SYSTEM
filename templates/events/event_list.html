@@ -1,0 +1,159 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Matukio | TAYOMI ARU{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6 mb-3 mb-md-0">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{% url 'user_dashboard' %}" class="text-purple text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Matukio</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold text-dark mb-0">Ratiba za Matukio</h2>
+        </div>
+
+        <div class="col-md-6">
+            <form method="GET" action="{% url 'event_list' %}" class="d-flex gap-2">
+                <div class="input-group shadow-sm rounded-pill overflow-hidden bg-white border">
+                    <span class="input-group-text bg-white border-0 ps-3">
+                        <i class="fas fa-search text-muted"></i>
+                    </span>
+                    <input type="text" name="q" class="form-control border-0 py-2 shadow-none" placeholder="Tafuta tukio..." value="{{ request.GET.q }}">
+                    <button class="btn btn-purple px-4" type="submit">Tafuta</button>
+                </div>
+                {% if request.GET.q %}
+                <a href="{% url 'event_list' %}" class="btn btn-light rounded-pill d-flex align-items-center border">
+                    <i class="fas fa-times text-danger"></i>
+                </a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                {% if request.GET.q %}
+                <p class="text-muted mb-0">Matokeo ya utafutaji: <strong>"{{ request.GET.q }}"</strong></p>
+                {% endif %}
+            </div>
+            {% if user.is_staff %}
+            <a href="{% url 'add_event' %}" class="btn btn-purple rounded-pill px-4 shadow-sm">
+                <i class="fas fa-plus-circle me-2"></i>Ongeza Tukio
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {% for event in events %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden event-card position-relative">
+                
+                <div class="event-image-container position-relative" style="height: 180px; overflow: hidden;">
+                    {% if event.image %}
+                        <img src="{{ event.image.url }}" class="w-100 h-100" style="object-fit: cover; transition: 0.5s;" alt="{{ event.title }}">
+                    {% else %}
+                        <div class="w-100 h-100 bg-purple-light d-flex align-items-center justify-content-center">
+                            <i class="fas fa-calendar-alt fa-3x text-purple opacity-25"></i>
+                        </div>
+                    {% endif %}
+                    
+                    {% if user.is_staff %}
+                    <div class="position-absolute top-0 end-0 m-2 d-flex gap-2">
+                        <a href="{% url 'edit_event' event.id %}" class="btn btn-white btn-sm rounded-circle shadow-sm" title="Hariri">
+                            <i class="fas fa-edit text-primary"></i>
+                        </a>
+                        <form action="{% url 'delete_event' event.id %}" method="POST" onsubmit="return confirm('Je, una uhakika unataka kufuta tukio hili?')">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-white btn-sm rounded-circle shadow-sm" title="Futa">
+                                <i class="fas fa-trash text-danger"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="p-3 border-bottom border-4 border-purple" style="background-color: rgba(155, 89, 182, 0.05);">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge rounded-pill bg-purple-light text-purple px-3">
+                            <i class="fas fa-users-rays me-1"></i> {{ event.group.name|default:"Wanachama Wote" }}
+                        </span>
+                        <small class="text-muted"><i class="far fa-clock"></i> {{ event.date|date:"d M" }}</small>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-0 text-truncate">{{ event.title }}</h5>
+                </div>
+
+                <div class="card-body">
+                    <p class="text-muted small mb-4">
+                        {{ event.description|truncatewords:15 }}
+                    </p>
+                    
+                    <div class="d-flex flex-column gap-3">
+                        <div class="d-flex align-items-center text-secondary small">
+                            <div class="icon-circle-sm me-3">
+                                <i class="fas fa-calendar-day text-purple"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold text-dark">Lini</div>
+                                <span>{{ event.date|date:"d M, Y" }} - {{ event.time|time:"H:i" }}</span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center text-secondary small">
+                            <div class="icon-circle-sm me-3">
+                                <i class="fas fa-map-marker-alt text-danger"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold text-dark">Wapi</div>
+                                <span class="text-truncate d-inline-block" style="max-width: 150px;">{{ event.location }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white border-0 pt-0 pb-4 px-4">
+                    <a href="{% url 'event_detail' event.id %}" class="btn btn-purple w-100 rounded-pill shadow-sm py-2">
+                        Ona Maelezo Kamili
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <div class="p-5 bg-light rounded-4 border border-dashed shadow-sm">
+                <i class="fas fa-search-minus fa-4x text-muted mb-3 opacity-25"></i>
+                <h4 class="text-dark fw-bold">Hakuna matukio yaliyopatikana</h4>
+                <p class="text-muted">Jaribu kutumia neno lingine la utafutaji au rudi kwenye dashboard.</p>
+                <a href="{% url 'event_list' %}" class="btn btn-outline-purple rounded-pill px-4 mt-2">Onyesha Matukio Yote</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .text-purple { color: #8e44ad !important; }
+    .bg-purple-light { background-color: rgba(142, 68, 173, 0.1); }
+    .btn-purple { background-color: #8e44ad; color: white; border: none; transition: 0.3s; }
+    .btn-purple:hover { background-color: #7d3c98; transform: translateY(-2px); color: white; }
+    .btn-outline-purple { border: #8e44ad 1px solid; color: #8e44ad; }
+    .btn-outline-purple:hover { background: #8e44ad; color: white; }
+    .btn-white { background: white; border: none; }
+    .border-purple { border-color: #8e44ad !important; }
+    .rounded-4 { border-radius: 1.2rem !important; }
+    .icon-circle-sm { 
+        width: 32px; height: 32px; 
+        background: rgba(142, 68, 173, 0.05); 
+        border-radius: 50%; 
+        display: flex; align-items: center; justify-content: center;
+    }
+    .event-card { transition: all 0.3s ease; border: 1px solid rgba(0,0,0,0.05) !important; }
+    .event-card:hover { transform: translateY(-8px); box-shadow: 0 10px 20px rgba(142,68,173,0.1) !important; }
+    .event-card:hover .event-image-container img { transform: scale(1.1); }
+</style>
+{% endblock %}

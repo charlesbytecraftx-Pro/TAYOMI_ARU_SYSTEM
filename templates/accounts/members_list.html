@@ -1,0 +1,132 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4 align-items-end">
+        <div class="col-lg-7">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{% url 'user_dashboard' %}" class="text-purple text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Wanachama</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold text-dark mb-3">Orodha ya Wanachama</h2>
+            
+            <form method="GET" action="{% url 'members_list' %}" class="d-flex">
+                <div class="input-group shadow-sm rounded-pill overflow-hidden border">
+                    <span class="input-group-text bg-white border-0 ps-3">
+                        <i class="fas fa-search text-muted"></i>
+                    </span>
+                    <input type="text" name="search" class="form-control border-0 shadow-none ps-2" 
+                        placeholder="Tafuta jina, namba, kundi..." 
+                        value="{{ search_query|default:'' }}">
+                    {% if search_query %}
+                        <a href="{% url 'members_list' %}" class="btn bg-white border-0 text-muted px-3">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    {% endif %}
+                    <button type="submit" class="btn btn-purple px-4">Tafuta</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-lg-5 text-lg-end mt-3 mt-lg-0">
+            <div class="d-flex justify-content-lg-end align-items-center gap-2">
+                <a href="?export=1{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-success rounded-pill px-3 shadow-sm">
+                    <i class="fas fa-file-excel me-1"></i> Pakua Excel
+                </a>
+                <div class="p-3 bg-light rounded-4 border text-center">
+                    <h3 class="fw-bold text-purple mb-0">{{ members.count }}</h3>
+                    <small class="text-muted text-uppercase fw-bold" style="font-size: 0.6rem;">Jumla</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3 text-uppercase small fw-bold text-muted">Mwanachama</th>
+                        <th class="py-3 text-uppercase small fw-bold text-muted">Kikundi</th>
+                        <th class="py-3 text-uppercase small fw-bold text-muted text-center">Mawasiliano</th>
+                        <th class="py-3 text-uppercase small fw-bold text-muted text-center">Tarehe aliojiunga</th>
+                        <th class="py-3 text-uppercase small fw-bold text-muted text-end pe-4">Hali</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member in members %}
+                    <tr>
+                        <td class="ps-4 py-3">
+                            <div class="d-flex align-items-center">
+                                {% if member.profile_image %}
+                                    <img src="{{ member.profile_image.url }}" class="rounded-circle me-3 border shadow-sm" style="width: 45px; height: 45px; object-fit: cover;">
+                                {% else %}
+                                    <div class="rounded-circle bg-purple-light text-purple d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <div class="fw-bold text-dark">{{ member.full_name|default:member.username }}</div>
+                                    <div class="text-muted small">@{{ member.username }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-purple-light text-purple rounded-pill px-3">
+                                {{ member.group.name|default:"General" }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <div class="fw-bold">
+                                <a href="tel:{{ member.phone }}" class="text-decoration-none text-dark">
+                                    <i class="fas fa-phone-alt me-1 text-success opacity-75"></i> {{ member.phone|default:"-" }}
+                                </a>
+                                {% if member.phone %}
+                                <a href="https://wa.me/255{{ member.phone|slice:'1:' }}" target="_blank" class="ms-1 text-success">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                            <div class="small text-muted"><i class="fas fa-envelope me-1 opacity-50"></i> {{ member.email }}</div>
+                        </td>
+                        <td class="text-center text-muted small">
+                            {{ member.date_joined|date:"d M, Y" }}
+                        </td>
+                        <td class="text-end pe-4">
+                            {% if member.is_staff %}
+                                <span class="badge bg-warning text-dark small fw-bold shadow-sm">
+                                    <i class="fas fa-crown me-1"></i> KIONGOZI
+                                </span>
+                            {% else %}
+                                <span class="badge bg-light text-muted small border">MWANACHAMA</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <div class="py-4 text-muted">
+                                <i class="fas fa-search fa-3x mb-3 opacity-25"></i>
+                                <h5>Hakuna mwanachama aliyepatikana.</h5>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .text-purple { color: #8e44ad !important; }
+    .bg-purple-light { background-color: rgba(142, 68, 173, 0.1) !important; }
+    .btn-purple { background-color: #8e44ad; color: white; border: none; }
+    .btn-purple:hover { background-color: #732d91; color: white; }
+    .table thead th { border-bottom: none; font-size: 0.75rem; letter-spacing: 0.05rem; }
+    .rounded-4 { border-radius: 1rem !important; }
+    .table-hover tbody tr:hover { background-color: rgba(142, 68, 173, 0.03); transition: 0.2s; }
+</style>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Msaada na Elimu | TAYOMI ARU{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-dark">Msaada & Elimu</h2>
+        <p class="text-muted">Pata msaada wa haraka kutoka kwa viongozi wa TAYOMI ARU</p>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3 text-purple"><i class="fas fa-book-reader me-2"></i> Mwongozo wa Mwanachama</h5>
+                    <div class="accordion accordion-flush" id="helpAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q1">
+                                    Jinsi ya kusasisha taarifa (Profile)?
+                                </button>
+                            </h2>
+                            <div id="q1" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                                <div class="accordion-body text-muted">
+                                    Nenda kwenye Dashboard, bofya kitufe cha <strong>"Sasisha Profile"</strong>. Hakikisha umeweka picha na namba yako ya simu kisha hifadhi.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q2">
+                                    Jinsi ya kulipia michango/ada?
+                                </button>
+                            </h2>
+                            <div id="q2" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                                <div class="accordion-body text-muted">
+                                    Bofya <strong>"Historia ya Malipo"</strong> kwenye Dashboard, kisha chagua aina ya mchango na weka taarifa za muamala wako. Kiongozi atahakiki na utapata taarifa.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 bg-purple text-white p-4 h-100" style="background-color: #8e44ad;">
+                <h5 class="fw-bold mb-4">Wasiliana Nasi</h5>
+                <div class="mb-4">
+                    <p class="mb-1 small opacity-75">Mwenyekiti</p>
+                    <h6 class="mb-0 fw-bold"><i class="fas fa-phone-alt me-2"></i> +255 7XX XXX XXX</h6>
+                </div>
+                <div class="mb-4">
+                    <p class="mb-1 small opacity-75">Mhazini (Kwa mambo ya malipo)</p>
+                    <h6 class="mb-0 fw-bold"><i class="fas fa-phone-alt me-2"></i> +255 6XX XXX XXX</h6>
+                </div>
+                <div class="mt-auto pt-3">
+                    <p class="small mb-0 opacity-75">Barua Pepe:</p>
+                    <p class="fw-bold">info@tayomiaru.or.tz</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-center mt-4">
+        <a href="{% url 'user_dashboard' %}" class="btn btn-light rounded-pill px-4 shadow-sm border">
+            <i class="fas fa-arrow-left me-2"></i>Rudi Dashboard
+        </a>
+    </div>
+</div>
+
+<style>
+    .text-purple { color: #8e44ad !important; }
+    .bg-purple { background-color: #8e44ad !important; }
+    .accordion-button:not(.collapsed) {
+        background-color: #f8f0ff;
+        color: #8e44ad;
+    }
+    .rounded-4 { border-radius: 1rem !important; }
+</style>
+{% endblock %}

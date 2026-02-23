@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | TAYOMI-ARU</title>
+</head>
+<body>
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Login | TAYOMI-ARU{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+        <div class="col-md-5 col-lg-4">
+            <div class="text-center mb-4">
+                <div class="d-flex align-items-center justify-content-center mb-1">
+                    <img src="{% static 'images/Casfeta_Tayomi_logo.png' %}" alt="Logo" class="me-2" style="width: 45px; height: 45px; object-fit: contain;">
+                    <h2 class="fw-bold mb-0" style="color: #9b59b6;">TAYOMI ARU</h2>
+                </div>
+                <p class="text-muted small">Information Management System</p>
+            </div>
+
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-dark text-white text-center py-3 rounded-top-4">
+                    <h5 class="mb-0 text-uppercase tracking-wider">System Login</h5>
+                </div>
+                <div class="card-body p-4">
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="font-size: 14px;">
+                            <i class="fas fa-exclamation-circle me-2"></i> Invalid Username or Password.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+
+                    <form method="post" autocomplete="off">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="id_username" class="form-label small fw-bold text-secondary">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fas fa-user text-muted"></i></span>
+                                {{ form.username }}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="id_password" class="form-label small fw-bold text-secondary">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fas fa-lock text-muted"></i></span>
+                                {{ form.password }}
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn w-100 py-2 fw-bold shadow-sm mb-3 text-white btn-purple">
+                            <i class="fas fa-sign-in-alt me-2"></i> LOGIN
+                        </button>
+                        
+                        <div class="text-center">
+                            <p class="small text-muted">
+                                Don't have an account? 
+                                <a href="{% url 'register' %}" class="text-decoration-none fw-bold link-purple">Register here</a>
+                            </p>
+                            <a href="#" class="text-decoration-none small text-muted">
+                                Forgot Password? Contact Admin: <span class="fw-bold text-dark">0748832699</span>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <p class="text-center mt-4 text-muted small">
+                &copy; 2026 TAYOMI ARU - All Rights Reserved
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Form Input Styling */
+    input[type="text"], input[type="password"], .form-control {
+        display: block; 
+        width: 100%; 
+        padding: 0.6rem 0.75rem; 
+        font-size: 1rem;
+        border: 1px solid #ced4da; 
+        border-left: none; 
+        border-radius: 0 0.375rem 0.375rem 0;
+    }
+
+    input:focus { 
+        border-color: #9b59b6; 
+        outline: 0; 
+        box-shadow: none; 
+    }
+
+    .btn-purple {
+        background-color: #9b59b6;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-purple:hover {
+        background-color: #8e44ad;
+        transform: translateY(-1px);
+    }
+
+    .link-purple {
+        color: #9b59b6;
+    }
+
+    .link-purple:hover {
+        color: #8e44ad;
+        text-decoration: underline !important;
+    }
+
+    .card:hover { 
+        transform: translateY(-5px); 
+        transition: 0.3s; 
+    }
+
+    .input-group-text { 
+        border-radius: 0.375rem 0 0 0.375rem; 
+    }
+</style>
+{% endblock %}
+</body>
+</html>

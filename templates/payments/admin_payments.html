@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uhakiki wa Malipo | Admin</title>
+</head>
+<body>
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Admin: Uhakiki wa Malipo | TAYOMI ARU{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4 shadow-sm border-0 mb-4" role="alert">
+                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %} me-2"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-7">
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="fas fa-user-shield me-2 text-purple"></i>Admin: Uhakiki
+            </h2>
+            <p class="text-muted small">Tafuta miamala, thibitisha malipo na pakua ripoti ya mapato.</p>
+        </div>
+        <div class="col-md-5 text-md-end">
+            <div class="d-flex justify-content-md-end gap-2">
+                <div class="badge bg-purple px-4 py-3 rounded-4 shadow-sm text-start">
+                    <small class="d-block opacity-75 fw-normal">MAPATO YOTE (TSH)</small>
+                    <span class="fs-5 fw-bold">{{ total_revenue|default:"0" }}</span>
+                </div>
+                <a href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}export=excel" 
+                   class="btn btn-success rounded-4 px-3 d-flex align-items-center shadow-sm">
+                    <i class="fas fa-file-excel me-2"></i> Export
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card p-4 mb-4 shadow-sm border-0 rounded-4">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label small fw-bold text-muted text-uppercase">Tafuta</label>
+                <input type="text" name="q" class="form-control bg-light border-0 py-2" placeholder="Jina au Reference..." value="{{ query|default:'' }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold text-muted text-uppercase">Kuanzia</label>
+                <input type="date" name="start_date" class="form-control bg-light border-0 py-2" value="{{ request.GET.start_date }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold text-muted text-uppercase">Mpaka</label>
+                <input type="date" name="end_date" class="form-control bg-light border-0 py-2" value="{{ request.GET.end_date }}">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-purple w-100 fw-bold rounded-3 py-2 shadow-sm" type="submit">
+                    <i class="fas fa-filter me-1"></i> Chuja
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3 small fw-bold text-muted">MWANACHAMA</th>
+                        <th class="py-3 small fw-bold text-muted">REFERENCE</th>
+                        <th class="py-3 small fw-bold text-muted">KIASI</th>
+                        <th class="py-3 small fw-bold text-muted">HALI</th>
+                        <th class="py-3 text-center small fw-bold text-muted">HATUA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in payments %}
+                    <tr>
+                        <td class="ps-4">
+                            <span class="fw-bold d-block text-dark">{{ p.user.username|title }}</span>
+                            <small class="text-muted"><i class="far fa-calendar-alt me-1"></i>{{ p.date_created|date:"d M Y" }}</small>
+                        </td>
+                        <td>
+                            <code class="text-primary fw-bold bg-light px-2 py-1 rounded">{{ p.reference_number|default:"N/A" }}</code>
+                            {% if p.receipt_image %}
+                                <a href="{{ p.receipt_image.url }}" target="_blank" class="ms-1 text-purple" title="Angalia Risiti">
+                                    <i class="fas fa-image"></i>
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td class="fw-bold text-dark">TSH {{ p.amount }}</td>
+                        <td>
+                            {% if p.status == 'Confirmed' %}
+                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 border border-success">Tayari</span>
+                            {% elif p.status == 'Pending' %}
+                                <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2 border border-warning">Uhakiki</span>
+                            {% else %}
+                                <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2 border border-danger">Imekataliwa</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if p.status == 'Pending' %}
+                            <div class="btn-group rounded-pill overflow-hidden border shadow-sm">
+                                <a href="{% url 'confirm_payment' p.id %}?action=confirm" class="btn btn-white btn-sm px-3 text-success" title="Confirm">
+                                    <i class="fas fa-check"></i>
+                                </a>
+                                <a href="{% url 'confirm_payment' p.id %}?action=reject" class="btn btn-white btn-sm px-3 text-danger" title="Reject">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            </div>
+                            {% else %}
+                                <i class="fas fa-check-double text-muted opacity-50"></i>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="fas fa-search-dollar fa-3x mb-3 opacity-25"></i>
+                            <p class="mb-0">Hakuna malipo yaliyopatikana kwa sasa.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .text-purple { color: #8e44ad !important; }
+    .btn-purple { background-color: #8e44ad; color: white; border: none; transition: 0.3s; }
+    .btn-purple:hover { background-color: #732d91; color: white; transform: translateY(-1px); }
+    .bg-purple { background-color: #8e44ad; color: white; }
+    .bg-success-subtle { background-color: rgba(25, 135, 84, 0.1) !important; }
+    .bg-warning-subtle { background-color: rgba(255, 193, 7, 0.1) !important; }
+    .bg-danger-subtle { background-color: rgba(220, 53, 69, 0.1) !important; }
+    .rounded-4 { border-radius: 1rem !important; }
+    .btn-white { background-color: white; border: none; }
+    .btn-white:hover { background-color: #f8f9fa; }
+    .form-control:focus { box-shadow: none; border: 1px solid #8e44ad !important; }
+</style>
+{% endblock %}
+</body>
+</html>

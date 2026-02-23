@@ -1,0 +1,58 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Thibitisha Kufuta | {{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5 text-center">
+            <div class="mb-4">
+                <div class="display-1 text-danger opacity-25">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                {% if event.image %}
+                <img src="{{ event.image.url }}" class="card-img-top" style="height: 150px; object-fit: cover; filter: grayscale(100%);">
+                {% endif %}
+                
+                <div class="card-body p-4 p-md-5">
+                    <h3 class="fw-bold text-dark mb-3">Je, una uhakika?</h3>
+                    <p class="text-muted mb-4">
+                        Unakaribia kufuta tukio la <br>
+                        <strong class="text-dark">"{{ event.title }}"</strong>. <br>
+                        Kitendo hiki hakiwezi kurudishwa nyuma.
+                    </p>
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="d-grid gap-3">
+                            <button type="submit" class="btn btn-danger rounded-pill py-2 fw-bold shadow-sm">
+                                <i class="fas fa-trash-alt me-2"></i>Ndio, Futa Tukio
+                            </button>
+                            
+                            <a href="{% url 'event_detail' event.id %}" class="btn btn-light rounded-pill py-2 text-purple border-0">
+                                Hapana, Ghairi Kitendo
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <p class="mt-4 text-muted small">
+                <i class="fas fa-info-circle me-1"></i> 
+                Tukio hili litaondolewa kwenye ratiba za wanachama wote mara moja.
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .text-purple { color: #8e44ad !important; }
+    .rounded-4 { border-radius: 1.5rem !important; }
+    .btn-danger { background-color: #e74c3c; border: none; }
+    .btn-danger:hover { background-color: #c0392b; transform: scale(1.02); }
+</style>
+{% endblock %}

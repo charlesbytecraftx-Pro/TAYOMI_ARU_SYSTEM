@@ -1,0 +1,153 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if edit_mode %}Hariri Tukio: {{ event.title }}{% else %}Ongeza Tukio Jipya{% endif %} | TAYOMI ARU
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="mb-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1">
+                        <li class="breadcrumb-item"><a href="{% url 'event_list' %}" class="text-purple text-decoration-none">Matukio</a></li>
+                        {% if edit_mode %}
+                        <li class="breadcrumb-item"><a href="{% url 'event_detail' event.id %}" class="text-purple text-decoration-none text-truncate" style="max-width: 150px;">{{ event.title }}</a></li>
+                        <li class="breadcrumb-item active">Hariri</li>
+                        {% else %}
+                        <li class="breadcrumb-item active">Ongeza Tukio</li>
+                        {% endif %}
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center justify-content-between">
+                    <h2 class="fw-bold text-dark mb-0">
+                        {% if edit_mode %}Hariri Maelezo ya Tukio{% else %}Sajili Tukio Jipya{% endif %}
+                    </h2>
+                    <i class="fas {% if edit_mode %}fa-pen-to-square{% else %}fa-calendar-plus{% endif %} fa-3x text-purple opacity-25"></i>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-purple p-1"></div>
+                <div class="card-body p-4 p-md-5">
+                    
+                    <form method="POST" enctype="multipart/form-data" class="needs-validation">
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger rounded-4">
+                            {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="row g-4">
+                            {% for field in form %}
+                            <div class="{% if field.name == 'date' or field.name == 'time' %}col-md-6{% else %}col-12{% endif %}">
+                                <label for="{{ field.id_for_label }}" class="form-label fw-bold text-dark small ms-1">
+                                    {{ field.label }}
+                                    {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                                </label>
+                                
+                                <div class="input-group custom-input-group">
+                                    {% if field.name == 'title' %}
+                                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="fas fa-heading"></i></span>
+                                    {% elif field.name == 'location' %}
+                                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="fas fa-map-pin"></i></span>
+                                    {% elif field.name == 'date' %}
+                                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="fas fa-calendar"></i></span>
+                                    {% elif field.name == 'time' %}
+                                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="fas fa-clock"></i></span>
+                                    {% endif %}
+                                    
+                                    {{ field }}
+                                </div>
+
+                                {% if field.help_text %}
+                                <div class="form-text small ms-1 text-muted">{{ field.help_text }}</div>
+                                {% endif %}
+                                
+                                {% if field.errors %}
+                                <div class="text-danger small mt-1 ms-1 animate__animated animate__fadeIn">
+                                    <i class="fas fa-circle-exclamation me-1"></i> {{ field.errors|striptags }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="d-flex flex-column flex-md-row gap-3 justify-content-end mt-5 border-top pt-4">
+                            <a href="{% if edit_mode %}{% url 'event_detail' event.id %}{% else %}{% url 'event_list' %}{% endif %}" class="btn btn-light rounded-pill px-4 py-2 border">
+                                Ghairi
+                            </a>
+                            <button type="submit" class="btn btn-purple rounded-pill px-5 py-2 shadow-sm">
+                                <i class="fas fa-check-circle me-2"></i>
+                                {% if edit_mode %}Hifadhi Marekebisho{% else %}Sajili Tukio Sasa{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-4 text-muted small">
+                <i class="fas fa-shield-halved me-1"></i> 
+                Ukurasa huu unaruhusiwa kwa Viongozi na Staff pekee.
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Purple Theme Variables */
+    .text-purple { color: #8e44ad !important; }
+    .bg-purple { background-color: #8e44ad !important; }
+    .btn-purple { background-color: #8e44ad; color: white; border: none; transition: all 0.3s ease; }
+    .btn-purple:hover { background-color: #7d3c98; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(142, 68, 173, 0.3); color: white; }
+    
+    .rounded-4 { border-radius: 1.25rem !important; }
+
+    /* Custom Styling for Django Generated Inputs */
+    input[type="text"], 
+    input[type="date"], 
+    input[type="time"], 
+    select, 
+    textarea {
+        display: block;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #212529;
+        background-color: #ffffff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0.75rem !important;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    /* Handling Input Groups for Icons */
+    .custom-input-group .input-group-text {
+        border-radius: 0.75rem 0 0 0.75rem !important;
+        border: 1px solid #ced4da;
+    }
+    .custom-input-group input, .custom-input-group select {
+        border-radius: 0 0.75rem 0.75rem 0 !important;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        border-color: #8e44ad !important;
+        box-shadow: 0 0 0 0.25rem rgba(142, 68, 173, 0.1) !important;
+        outline: 0;
+    }
+
+    textarea { min-height: 120px; }
+
+    .form-label { margin-bottom: 0.5rem; }
+    
+    /* Animation for errors */
+    .animate__fadeIn { animation: fadeIn 0.5s; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
+{% endblock %}
