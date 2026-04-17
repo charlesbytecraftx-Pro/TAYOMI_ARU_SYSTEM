@@ -127,7 +127,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000', 'http://localhost:8000']
+CSRF_TRUSTED_ORIGINS = ['http://*.vercel.app']
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'user_dashboard'
@@ -138,7 +138,19 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DATABASE = {
     'default': dj_database_url.config(
-        default='postgresql: // neondb_owner: npg_O9ViZmGD6AaW@ep-young-silence-anjqexu8.c-6.us-east-1.aws.neon.tech/neondb?sslmode=req',
+        default=os.environ.get(
+            'postgresql: // neondb_owner: npg_O9ViZmGD6AaW@ep-young-silence-anjqexu8.c-6.us-east-1.aws.neon.tech/neondb?sslmode=req'),
         conn_max_age=600
     )
 }
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Huu ndio muhimu kwa Vercel
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
