@@ -1,5 +1,5 @@
 import os
-
+import dj_database_url
 """
 Django settings for core project.
 
@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-v3-m*o&n8%7dy(p6ymh(o(5vms_m&0)k&7v9pldg=1#djsjh4e
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.vercel.app', 'now.sh', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -135,3 +135,10 @@ LOGOUT_REDIRECT_URL = 'login'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+DATABASE = {
+    'default': dj_database_url.config(
+        default='postgresql: // neondb_owner: npg_O9ViZmGD6AaW@ep-young-silence-anjqexu8.c-6.us-east-1.aws.neon.tech/neondb?sslmode=req',
+        conn_max_age=600
+    )
+}
